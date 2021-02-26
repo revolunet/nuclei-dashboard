@@ -1,0 +1,17 @@
+name: Nuclei CI
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 6 * * *"
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    container:
+      image: projectdiscovery/nuclei:latest
+    steps:
+      - name: Scan
+        run: |
+          /app/nuclei -update-templates -t /app/nuclei-templates/ -target https://revolunet.com > output.txt
+          cat output.txt
