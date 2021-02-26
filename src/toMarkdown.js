@@ -20,6 +20,7 @@ const makeBadge = (severity, count) => {
 };
 
 const smallUrl = (url) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+const slugify = (url) => smallUrl(url).replace(/\./g, "");
 
 const makeUrl = (url) => {
   const small = smallUrl(url);
@@ -39,7 +40,6 @@ const makeDetailUrl = (summary) => {
 const toMarkdown = (entries) => {
   const byUrl = entriesByUrl(entries);
 
-  // console.log("entries", entries);
   const severities = Array.from(
     new Set(entries.map((entry) => entry.severity))
   );
@@ -54,7 +54,7 @@ Url                  | details | ${severities
 ${Object.keys(byUrl)
   .map(
     (url) =>
-      `${makeUrl(url)} | [🔎](#${smallUrl(url)}) | ${severities
+      `${makeUrl(url)} | [🔎](#${slugify(url)}) | ${severities
         .map((sev) =>
           makeBadge(sev, byUrl[url].filter((e) => e.severity === sev).length)
         )

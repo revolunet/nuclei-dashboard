@@ -48,12 +48,3 @@ jobs:
           author_name: ${{ secrets.SOCIALGROOVYBOT_NAME }}
           author_email: ${{ secrets.SOCIALGROOVYBOT_EMAIL }}
           message: "chore: nuclei update"
-  # nuclei:
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: projectdiscovery/nuclei:latest
-  #   steps:
-  #     - name: Scan
-  #       run: -update-templates -t /app/nuclei-templates/ -target https://revolunet.com > output.txt
-  #     - name: Debug
-  #       run: cat output.txt
