@@ -1,9 +1,12 @@
+const getKey = (entry) => entry.host.replace(/^https?:\/\//, "");
+
 const entriesByUrl = (entries) =>
   entries.reduce((allEntries, entry) => {
-    if (!allEntries[entry.host]) {
-      allEntries[entry.host] = [];
+    const key = getKey(entry);
+    if (!allEntries[key]) {
+      allEntries[key] = [];
     }
-    allEntries[entry.host].push(entry);
+    allEntries[key].push(entry);
     return allEntries;
   }, {});
 
