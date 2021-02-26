@@ -6,12 +6,56 @@ on:
   schedule:
     - cron: "0 6 * * *"
 jobs:
-  lighthouse:
+  nuclei:
     runs-on: ubuntu-latest
-    container:
-      image: projectdiscovery/nuclei:latest
     steps:
-      - name: Scan
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          path: /home/runner/go/bin/nuclei
+          key: ${{ runner.os }}-${{ hashFiles('/home/runner/go/bin/nuclei') }}
+
+      - uses: projectdiscovery/nuclei-action@main
+        with:
+          urls: "urls.txt"
+          templates: "nuclei-templates"
+          output: "nuclei.log"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: nuclei.log
+          path: nuclei.log
+
+  dashboard:
+    needs: nuclei
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download nuclei results
+        uses: actions/download-artifact@v2
+        with:
+          name: nuclei.log
+          path: nuclei.log
+      - name: Build dashboard
         run: |
-          /app/nuclei -update-templates -t /app/nuclei-templates/ -target https://revolunet.com > output.txt
-          cat output.txt
+          ls
+          cat nuclei.log
+          node src/generateReport.js ./nuclei-results > README.md
+          cp nuclei.log/* results/nuclei-$(date +"%Y%m%d_%I%M%p").log
+      - uses: EndBug/add-and-commit@v7
+        with:
+          add: '["README.md", "results"]'
+          author_name: ${{ secrets.SOCIALGROOVYBOT_NAME }}
+          author_email: ${{ secrets.SOCIALGROOVYBOT_EMAIL }}
+          message: "chore: nuclei update"
+  # nuclei:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: projectdiscovery/nuclei:latest
+  #   steps:
+  #     - name: Scan
+  #       run: -update-templates -t /app/nuclei-templates/ -target https://revolunet.com > output.txt
+  #     - name: Debug
+  #       run: cat output.txt
