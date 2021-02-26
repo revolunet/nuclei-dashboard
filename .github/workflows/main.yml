@@ -37,13 +37,14 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: nuclei.log
-          path: nuclei.log
+          path: nuclei-logs
       - name: Build dashboard
         run: |
           ls
-          cat nuclei.log
-          node src/generateReport.js ./nuclei-results > README.md
-          cp nuclei.log/* results/nuclei-$(date +"%Y%m%d_%I%M%p").log
+          ls nuclei-logs
+          cat ./nuclei-logs/nuclei.log
+          node src/generateReport.js ./nuclei-logs/nuclei.log > README.md
+          cp nuclei-logs/nuclei.log results/nuclei-$(date +"%Y%m%d_%I%M%p").log
       - uses: EndBug/add-and-commit@v7
         with:
           add: '["README.md", "results"]'
