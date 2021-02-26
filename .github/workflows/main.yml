@@ -41,7 +41,7 @@ jobs:
       - name: Build dashboard
         run: |
           node src/generateReport.js ./nuclei-logs/nuclei.log > README.md
-          cp nuclei-logs/nuclei.log results/nuclei-$(date +"%Y%m%d_%I%M%p").log
+          cp nuclei-logs/nuclei.log results/nuclei-$(date +"%Y%m%d_%I%M%S").log
       - uses: EndBug/add-and-commit@v7
         with:
           add: '["README.md", "results"]'
