@@ -1,9 +1,9 @@
 const entriesByUrl = (entries) =>
   entries.reduce((allEntries, entry) => {
-    if (!allEntries[entry.matched]) {
-      allEntries[entry.matched] = [];
+    if (!allEntries[entry.host]) {
+      allEntries[entry.host] = [];
     }
-    allEntries[entry.matched].push(entry);
+    allEntries[entry.host].push(entry);
     return allEntries;
   }, {});
 
