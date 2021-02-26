@@ -1,9 +1,9 @@
-const parseReports = require("./parseReports");
+const parseLog = require("./parseLog");
 const toMarkdown = require("./toMarkdown");
 
-const generateReport = (reportsPath) => {
-  const summaries = parseReports(reportsPath);
-  const markdown = toMarkdown(summaries);
+const generateReport = (logPath) => {
+  const entries = parseLog(logPath);
+  const markdown = toMarkdown(entries);
 
   console.log(markdown);
 };
