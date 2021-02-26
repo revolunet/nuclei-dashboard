@@ -1,3 +1,5 @@
+const entriesByUrl = require("./entriesByUrl");
+
 const makeBadge = (severity, count) => {
   if (count === 0) {
     badge = "🏆";
@@ -17,8 +19,10 @@ const makeBadge = (severity, count) => {
   return badge;
 };
 
+const smallUrl = (url) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
 const makeUrl = (url) => {
-  const small = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const small = smallUrl(url);
   return `[${small}](${url})`;
 };
 
@@ -33,22 +37,13 @@ const makeDetailUrl = (summary) => {
 };
 
 const toMarkdown = (entries) => {
-  const entriesByUrl = entries.reduce((allEntries, entry) => {
-    if (!allEntries[entry.matched]) {
-      allEntries[entry.matched] = [];
-    }
-    allEntries[entry.matched].push(entry);
-    return allEntries;
-  }, {});
+  const byUrl = entriesByUrl(entries);
 
   // console.log("entries", entries);
   const severities = Array.from(
     new Set(entries.map((entry) => entry.severity))
   );
 
-  console.log("severities", severities);
-
-  //console.log("entriesByUrl", entriesByUrl);
   const markdown = [
     `# Nuclei dashboard\n`,
     `
@@ -56,20 +51,34 @@ Url                  | details | ${severities
       .map((sev) => `${sev}`)
       .join(" | ")}
 ---------------------|:-------:|${severities.map((sev) => `:---:`).join(" | ")}
-${Object.keys(entriesByUrl)
+${Object.keys(byUrl)
   .map(
     (url) =>
-      `${makeUrl(url)} | - | ${severities
+      `${makeUrl(url)} | [🔎](#${smallUrl(url)}) | ${severities
         .map((sev) =>
-          makeBadge(
-            sev,
-            entriesByUrl[url].filter((e) => e.severity === sev).length
-          )
+          makeBadge(sev, byUrl[url].filter((e) => e.severity === sev).length)
         )
         .join(" | ")}`
   )
   .join("\n")}
 `,
+    ``,
+    `## Details`,
+    ``,
+    `${Object.keys(byUrl)
+      .map(
+        (url) =>
+          `### ${makeUrl(url)}
+
+severity | matcher | name
+---------|---------|---------
+${byUrl[url]
+  .map((entry) => `${entry.severity} | ${entry.matcher_name} | ${entry.name}`)
+  .join("\n")}
+
+`
+      )
+      .join("\n")}`,
   ].join("\n");
 
   return markdown;
